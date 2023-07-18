@@ -18,7 +18,7 @@ k = 100
 
 # Read data
 print('Fetching dataset')
-xb = io.read_fbin(dataset, 0, data_size) # the whole dataset
+xb = io.read_fbin(dataset) # the whole dataset
 num, dim = xb.shape # the number of vectors in the dataset and the dimension of the vectors
 
 xq = io.read_fbin(query_set) # read the query vectors (for ground truth)
