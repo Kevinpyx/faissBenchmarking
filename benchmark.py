@@ -1,7 +1,8 @@
 import time
 import faiss
 import numpy as np
-import itertools
+import itertools # for cartesian product
+import psutil # for memory usage
 
 # macro to indicate the number of indexing methods tested
 INDNUM = 4
@@ -144,6 +145,13 @@ def get_indices(method, d, param_combinations):
     return indList # list of indices
 
 
+# precon: 
+#       - GT_id and pred_id are 2-D arrays with the same shape
+#       - the first dimension is the number of queries
+#       - the second dimension is the number of nearest neighbors
+# postcon:
+#       - the hit rate will be returned (from 0 to 1)
+
 def get_accuracy(GT_id, pred_id): #calculate the hit rate
     num_queries, knn = GT_id.shape
     hit_count = 0
@@ -156,7 +164,8 @@ def get_accuracy(GT_id, pred_id): #calculate the hit rate
 
     return hit_count/np.prod(GT_id.shape) # the hit rate = hit count/number of elements in GT
 
-
+def measure_memory_usage():
+    return psutil.Process().memory_info().rss / (1024 * 1024)
 
 # runBenchmark: 
 #   precon: 
@@ -200,11 +209,12 @@ def runBenchmark(method, xb, xq, GT_id, k=None):
         return None
     
     # prepare lists for result storage
-    result_num = 5 # modify when you add or remove
+    result_num = 6 # modify when you add or remove
     training_time = []
     adding_time = []
     total_time = []
     time_per_vec = []
+    memory = []
     hit_rates = []
     
     # for every index, we train and perform timed search
@@ -224,6 +234,7 @@ def runBenchmark(method, xb, xq, GT_id, k=None):
 
         # perform search
         print('Searching for', k, 'nearest neighbors...')
+        memory.append(measure_memory_usage())
         pred_dist, pred_id = search_index(ind, xq, k)
 
         # end the timer
@@ -242,7 +253,7 @@ def runBenchmark(method, xb, xq, GT_id, k=None):
         round_number += 1
 
     # combine, format, and return the time and hitrate result
-    results = np.dstack((training_time, adding_time, total_time, time_per_vec, hit_rates))
+    results = np.dstack((training_time, adding_time, total_time, time_per_vec, memory, hit_rates))
     
     # checking parameter number
     index = INDPARAM[method]

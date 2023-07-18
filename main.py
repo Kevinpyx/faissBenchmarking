@@ -6,14 +6,13 @@ import benchmark as bm
 
 # Define dataset and ground truth to be used here
 dataset = '/home/ypx/faissTesting/dataset/yandex_deep/base.10M.fbin'
-ground_truth = '/home/ypx/faissTesting/dataset/GT_10M/deep-10M'  # This is from big-ann-benchmarks.com
+ground_truth = '/home/ypx/faissTesting/dataset/yandex_deep/my_ground_truth' # I made the ground truth according to the dataset base.10M.fbin and query set query.public.10K.fbin
 query_set = '/home/ypx/faissTesting/dataset/yandex_deep/query.public.10K.fbin'
 
 # Search specifications
 # method: currently only 'FlatL2', 'PQ', 'LSH', 'HNSWFlat' are defined
 # k: 1~100
 method = 'FlatL2'
-data_size = 10000000
 k = 100
 
 # Read data
