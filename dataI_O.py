@@ -25,24 +25,18 @@ def read_fbin(filename, start_idx=0, chunk_size=None):
         arr = np.fromfile(f, count=nvecs * dim, dtype=np.float32, 
                           offset=start_idx * 4 * dim)
     return arr.reshape(nvecs, dim)
- 
 
 def read_ground_truth(filename):
-    """ Read ground truth file that contains float32 vectors
-    Args:
-        :param filename (str): path to ground truth file
-
-    Returns:
-        neighbor_ids
-        distances
-    """
+    # The ground truth binary files for k-NN search consist of the following information:
+    # num_queries(uint32_t) K-NN(uint32) followed by num_queries X K x sizeof(uint32_t) 
+    # bytes of data representing the IDs of the K-nearest neighbors of the queries, followed 
+    # by num_queries X K x sizeof(float) bytes of data representing the distances to the 
+    # corresponding points. The distances help identify neighbors tied in terms of distances. 
     with open(filename, "rb") as f:
-        nqueries, k = np.fromfile(f, count=2, dtype=np.uint32)
-        print(nqueries, k)
-        neighbor_ids = np.fromfile(f, dtype=np.uint32, count=nqueries * k)
-    
-        distances = np.fromfile(f, dtype = np.float32, count=nqueries * k)
-    return neighbor_ids.reshape(nqueries, k), distances.reshape(nqueries, k)
+        num_queries, K = np.fromfile(f, count=2, dtype=np.uint32)
+        ids = np.fromfile(f, count=num_queries * K, dtype=np.uint32)
+        dists = np.fromfile(f, count=num_queries * K, dtype=np.float32)
+    return ids.reshape(num_queries, K), dists.reshape(num_queries, K)
 
  
 def read_ibin(filename, start_idx=0, chunk_size=None):

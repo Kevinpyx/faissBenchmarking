@@ -6,8 +6,7 @@ import benchmark as bm
 
 # Define dataset and ground truth to be used here
 dataset = '/home/ypx/faissTesting/dataset/yandex_deep/base.10M.fbin'
-#ground_truth = '/home/ypx/faissTesting/dataset/GT_10M/deep-10M'  # This is from big-ann-benchmarks.com
-ground_truth = '/home/ypx/faissTesting/dataset/groundtruth.public.10K.ibin' # This is from Yandex website
+ground_truth = '/home/ypx/faissTesting/dataset/GT_10M/deep-10M'  # This is from big-ann-benchmarks.com
 query_set = '/home/ypx/faissTesting/dataset/yandex_deep/query.public.10K.fbin'
 
 # Search specifications
