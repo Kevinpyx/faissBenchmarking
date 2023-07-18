@@ -38,7 +38,7 @@ def read_ground_truth(filename):
     """
     with open(filename, "rb") as f:
         nqueries, k = np.fromfile(f, count=2, dtype=np.uint32)
-        print(nqueries, k)
+        #print(nqueries, k)
         neighbor_ids = np.fromfile(f, dtype=np.uint32, count=nqueries * k)
     
         distances = np.fromfile(f, dtype = np.float32, count=nqueries * k)
