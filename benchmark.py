@@ -213,6 +213,9 @@ def runBenchmark(method, xb, xq, GT_id, k=None, run=1):
         return None
     
     result_dict = INDPARAM[method] # we will append the results to this dictionary and return so that users can see the parameters used for each result
+    # prepare these numbers outside of the loop to avoid repeated calculation
+    parameters = result_dict['parameters'] # list of parameters
+    numParam = len(parameters) # number of parameters
 
     for turn in range(run): # run the benchmark for the specified number of times
         print('Run', turn+1, 'out of', run)
@@ -263,10 +266,6 @@ def runBenchmark(method, xb, xq, GT_id, k=None, run=1):
 
         # combine, format, and return the time and hitrate result
         results = np.dstack((training_time, adding_time, total_time, time_per_vec, memory, hit_rates))
-        
-        # checking parameter number
-        parameters = result_dict # list of parameters
-        numParam = len(parameters) # number of parameters
 
         if numParam < 2:
             result_dict['results'].append(results)
