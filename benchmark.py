@@ -269,6 +269,9 @@ def runBenchmark(method, xb, xq, GT_id, k=None, run=1):
         # combine, format, and return the time and hitrate result
         results = np.dstack((training_time, adding_time, total_time, time_per_vec, memory, hit_rates))
 
+        #
+        print('Results for parameters', dim, *param_combinations[round_number-1],'in run', turn, ':', results)
+
         if numParam < 2:
             result_dict['results'].append(results)
         else: 

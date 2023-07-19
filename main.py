@@ -1,7 +1,6 @@
 import dataI_O as io
 import numpy as np
 import benchmark as bm
-import time
 
 # Define dataset and ground truth to be used here
 dataset = '/home/ypx/faissTesting/dataset/yandex_deep/base.10M.fbin'
@@ -11,12 +10,12 @@ query_set = '/home/ypx/faissTesting/dataset/yandex_deep/query.public.10K.fbin'
 # Search specifications
 # method: currently only 'FlatL2', 'PQ', 'LSH', 'HNSWFlat' are defined
 # k: 1~100, None for all
-method = 'PQ'
+method = 'FlatL2'
 k = 100
 
 # Read data
 print('Fetching dataset')
-xb = io.read_fbin(dataset, chunk_size=10000) # the whole dataset
+xb = io.read_fbin(dataset) # the whole dataset
 num, dim = xb.shape # the number of vectors in the dataset and the dimension of the vectors
 
 xq = io.read_fbin(query_set) # read the query vectors (for ground truth)
@@ -27,10 +26,10 @@ GT_id, GT_dist = io.read_ground_truth(ground_truth) # GT means ground truth
 K = GT_id.shape[1] # the number of nearest neighbors
 print('Data loaded\n...........................')
 
-result_dict = bm.runBenchmark(method, xb, xq, GT_id, k, run=5)
+result_dict = bm.runBenchmark(method, xb, xq, GT_id, k, run=10)
 
 # Save results
 print('Saving results')
-filename = '/home/ypx/faissTesting/benchmarking/results/' + method + '_' + str(num) + '_' + str(dim) + '_' + str(query_size) + '_' + str(k) + '.h5'
+filename = '/home/ypx/faissTesting/benchmarking/results/' + method + '_' + '10M' + '_' + str(dim) + '_' + '10k' + '_' + str(k) + '.h5'
 io.save_results(filename, result_dict)
 print('Results saved')
