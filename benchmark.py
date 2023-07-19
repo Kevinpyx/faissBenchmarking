@@ -271,7 +271,7 @@ def runBenchmark(method, xb, xq, GT_id, k=None, run=1):
         if numParam < 2:
             result_dict['results'].append(results)
         else: 
-            x = [len(index[parameters[n]]) for n in range(numParam)] # list of numbers of parameter values (e.g. for PQ, m = [8, 16], nbits = [8, 12, 16], x = [2, 3])
+            x = [len(result_dict[parameters[n]]) for n in range(numParam)] # list of numbers of parameter values (e.g. for PQ, m = [8, 16], nbits = [8, 12, 16], x = [2, 3])
             x.append(result_num) 
             result_dict['results'].append(results.reshape(tuple(x))) # reshape the results to the shape of the parameter values and add to the dictionary
 
