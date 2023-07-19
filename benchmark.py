@@ -14,24 +14,28 @@ INDNUM = 4
 INDPARAM = {
     'FlatL2' : {
         'Index' : 'FlatL2',
-        'params' : [] # empty list because no parameters 
+        'params' : [], # empty list because no parameters 
         # no parameters other than dimension
+        'results' : []
     },
     'PQ' : { # product quantization
         'Index' : 'PQ',
         'params' : ['m', 'nbits'],
-        'm' : [8, 32, 96], # number of subspaces
-        'nbits' : [8, 10] # 2^n is number of centroid for every subspace
+        'm' : [8, 16], # number of subspaces
+        'nbits' : [6, 8], # 2^n is number of centroid for every subspace
+        'results' : [] # the results will be stored in this list
     }, 
     'LSH' : {
         'Index' : 'LSH',
         'params' : ['nbits'],
-        'nbits' : [2, 6, 8, 16, 24, 32, 48, 64] # the number of hyperplanes to used
+        'nbits' : [2, 6, 8, 16, 24, 32], # the number of hyperplanes to used
+        'results' : []
     },
     'HNSWFlat' : {
         'Index' : 'HNSWFlat',
         'params' : ['M'],
-        'M' : [64] # the number of nearest neighbor connections every vertex in the constructed graph has
+        'M' : [64], # the number of nearest neighbor connections every vertex in the constructed graph has
+        'results' : []
     }
 }
 
@@ -173,7 +177,7 @@ def measure_memory_usage():
 #       - k must be an integer between 1 and k_max in the ground truth
 #       - GT.shape = query_size * k_max * 2 (first layer: ids, second layer: distances)
 
-def runBenchmark(method, xb, xq, GT_id, k=None): 
+def runBenchmark(method, xb, xq, GT_id, k=None, run=1): 
     # check whether method is valid
     if method in INDLIST:
         pass
@@ -208,63 +212,69 @@ def runBenchmark(method, xb, xq, GT_id, k=None):
         print('Unable to get faiss indices')
         return None
     
-    # prepare lists for result storage
-    result_num = 6 # modify when you add or remove
-    training_time = []
-    adding_time = []
-    total_time = []
-    time_per_vec = []
-    memory = []
-    hit_rates = []
+    result_dict = INDPARAM[method] # we will append the results to this dictionary and return so that users can see the parameters used for each result
+
+    for turn in range(run): # run the benchmark for the specified number of times
+        print('Run', turn+1, 'out of', run)
+
+        # prepare lists for result storage
+        result_num = 6 # modify when you add or remove
+        training_time = []
+        adding_time = []
+        total_time = []
+        time_per_vec = []
+        memory = []
+        hit_rates = []
     
-    # for every index, we train and perform timed search
-    for ind in indList:
-        if param_combinations is None:
-            print('Round 1 / 1: Index', method, 'with parameter', dim) 
-        else:
-            print('Round', round_number, '/', total_rounds, ': Index', method, 'with parameters', dim, *param_combinations[round_number-1])
+        # for every index, we train and perform timed search
+        for ind in indList:
+            if param_combinations is None:
+                print('Round 1 / 1: Index', method, 'with parameter', dim) 
+            else:
+                print('Round', round_number, '/', total_rounds, ': Index', method, 'with parameters', dim, *param_combinations[round_number-1])
 
-        # train the index and get time spent
-        t_t, t_a = train_index(ind, xb)
-        training_time.append(t_t)
-        adding_time.append(t_a)
+            # train the index and get time spent
+            t_t, t_a = train_index(ind, xb)
+            training_time.append(t_t)
+            adding_time.append(t_a)
 
-        # start the timer
-        start_time = time.time()
+            # start the timer
+            start_time = time.time()
 
-        # perform search
-        print('Searching for', k, 'nearest neighbors...')
-        memory.append(measure_memory_usage())
-        pred_dist, pred_id = search_index(ind, xq, k)
+            # perform search
+            print('Searching for', k, 'nearest neighbors...')
+            memory.append(measure_memory_usage())
+            pred_dist, pred_id = search_index(ind, xq, k)
 
-        # end the timer
-        end_time = time.time()
+            # end the timer
+            end_time = time.time()
 
-        # calculate and append the elapsed time
-        elapsed = end_time - start_time
-        total_time.append(elapsed)
-        per_vec = elapsed/(query_size * k)
-        time_per_vec.append(per_vec)
+            # calculate and append the elapsed time
+            elapsed = end_time - start_time
+            total_time.append(elapsed)
+            per_vec = elapsed/(query_size * k)
+            time_per_vec.append(per_vec)
 
-        # calculate hit rate
-        hit_rates.append(get_accuracy(GT_id, pred_id))
+            # calculate hit rate
+            hit_rates.append(get_accuracy(GT_id, pred_id))
+            
+            # increment the round number
+            round_number += 1
+
+        # combine, format, and return the time and hitrate result
+        results = np.dstack((training_time, adding_time, total_time, time_per_vec, memory, hit_rates))
         
-        # increment the round number
-        round_number += 1
+        # checking parameter number
+        parameters = result_dict # list of parameters
+        numParam = len(parameters) # number of parameters
 
-    # combine, format, and return the time and hitrate result
-    results = np.dstack((training_time, adding_time, total_time, time_per_vec, memory, hit_rates))
-    
-    # checking parameter number
-    index = INDPARAM[method]
-    parameters = index['params']
-    numParam = len(parameters)
+        if numParam < 2:
+            result_dict['results'].append(results)
+        else: 
+            x = [len(index[parameters[n]]) for n in range(numParam)] # list of numbers of parameter values (e.g. for PQ, m = [8, 16], nbits = [8, 12, 16], x = [2, 3])
+            x.append(result_num) 
+            result_dict['results'].append(results.reshape(tuple(x))) # reshape the results to the shape of the parameter values and add to the dictionary
 
-    if numParam < 2:
-        return results
-    else: 
-        x = [len(index[parameters[n]]) for n in range(numParam)] # list of numbers of parameter values (e.g. for PQ, m = [8, 16], nbits = [8, 12, 16], x = [2, 3])
-        x.append(result_num) 
-        return results.reshape(tuple(x))
+    return result_dict
 
 
