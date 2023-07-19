@@ -203,8 +203,6 @@ def runBenchmark(method, xb, xq, GT_id, k=None, run=1):
 
     # get all the different parameter combinations 
     param_combinations = get_parameters(method)
-    total_rounds = 1 if param_combinations is None else len(param_combinations)
-    round_number = 1
 
     # get faiss indices instantiated with different parameter combinations
     indList = get_indices(method, dim, param_combinations)
@@ -214,11 +212,15 @@ def runBenchmark(method, xb, xq, GT_id, k=None, run=1):
     
     result_dict = INDPARAM[method] # we will append the results to this dictionary and return so that users can see the parameters used for each result
     # prepare these numbers outside of the loop to avoid repeated calculation
-    parameters = result_dict['parameters'] # list of parameters
+    parameters = result_dict['params'] # list of parameters
     numParam = len(parameters) # number of parameters
 
     for turn in range(run): # run the benchmark for the specified number of times
         print('Run', turn+1, 'out of', run)
+
+        # prepare for the loop
+        total_rounds = 1 if param_combinations is None else len(param_combinations) # number of rounds
+        round_number = 1 # the round number
 
         # prepare lists for result storage
         result_num = 6 # modify when you add or remove

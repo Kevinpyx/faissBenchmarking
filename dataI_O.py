@@ -2,7 +2,7 @@
 
 import struct
 import numpy as np
- 
+import h5py
  
 """
                   IO Utils
@@ -38,6 +38,15 @@ def read_ground_truth(filename):
         dists = np.fromfile(f, count=num_queries * K, dtype=np.float32)
     return ids.reshape(num_queries, K), dists.reshape(num_queries, K)
 
+def save_results(filename, results):
+    with h5py.File(filename, 'w') as f:
+        f.create_dataset('results', data=results)
+
+def load_results(filename):
+    with h5py.File(filename, 'r') as f:
+        results = f['results'][:]
+    return results
+    
  
 def read_ibin(filename, start_idx=0, chunk_size=None):
     """ Read *.ibin file that contains int32 vectors
