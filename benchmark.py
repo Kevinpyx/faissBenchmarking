@@ -21,20 +21,20 @@ INDPARAM = {
     'PQ' : { # product quantization
         'Index' : 'PQ',
         'params' : ['m', 'nbits'],
-        'm' : [8, 16], # number of subspaces
-        'nbits' : [6, 8], # 2^n is number of centroid for every subspace
+        'm' : [1, 2, 3, 8, 12, 16, 24, 32, 48, 96], # number of subspaces
+        'nbits' : [6, 8, 10], # 2^n is number of centroid for every subspace
         'results' : [] # the results will be stored in this list
     }, 
     'LSH' : {
         'Index' : 'LSH',
         'params' : ['nbits'],
-        'nbits' : [2, 6, 8, 16, 24, 32], # the number of hyperplanes to used
+        'nbits' : [2, 6, 8, 16, 24, 32, 64], # the number of hyperplanes to used
         'results' : []
     },
     'HNSWFlat' : {
         'Index' : 'HNSWFlat',
         'params' : ['M'],
-        'M' : [64], # the number of nearest neighbor connections every vertex in the constructed graph has
+        'M' : [32, 64], # the number of nearest neighbor connections every vertex in the constructed graph has
         'results' : []
     }
 }
@@ -226,7 +226,7 @@ def runBenchmark(method, xb, xq, GT_id, k=None, run=1):
         result_num = 6 # modify when you add or remove
         training_time = []
         adding_time = []
-        total_time = []
+        total_search_time = []
         time_per_vec = []
         memory = []
         hit_rates = []
@@ -256,7 +256,7 @@ def runBenchmark(method, xb, xq, GT_id, k=None, run=1):
 
             # calculate and append the elapsed time
             elapsed = end_time - start_time
-            total_time.append(elapsed)
+            total_search_time.append(elapsed)
             per_vec = elapsed/(query_size * k)
             time_per_vec.append(per_vec)
 
@@ -266,11 +266,13 @@ def runBenchmark(method, xb, xq, GT_id, k=None, run=1):
             # increment the round number
             round_number += 1
 
-        # combine, format, and return the time and hitrate result
-        results = np.dstack((training_time, adding_time, total_time, time_per_vec, memory, hit_rates))
+            ind.reset() # reset the index
 
-        #
-        print('Results for parameters', dim, *param_combinations[round_number-1],'in run', turn, ':', results)
+        # combine, format, and return the time and hitrate result
+        results = np.dstack((training_time, adding_time, total_search_time, time_per_vec, memory, hit_rates))
+
+        # 
+        print('Results for', method,'in run', turn+1, ':', results)
 
         if numParam < 2:
             result_dict['results'].append(results)
