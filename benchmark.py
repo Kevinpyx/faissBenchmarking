@@ -21,7 +21,7 @@ INDPARAM = {
     'PQ' : { # product quantization
         'Index' : 'PQ',
         'params' : ['m', 'nbits'],
-        'm' : [1, 2, 3, 8, 12, 16, 24, 32, 48, 96], # number of subspaces
+        'm' : [1, 3, 8, 16, 32, 48], # number of subspaces
         'nbits' : [6, 8, 10], # 2^n is number of centroid for every subspace
         'results' : [] # the results will be stored in this list
     }, 
