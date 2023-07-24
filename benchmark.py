@@ -28,13 +28,13 @@ INDPARAM = {
     'LSH' : {
         'Index' : 'LSH',
         'params' : ['nbits'],
-        'nbits' : [2, 6, 8, 16, 24, 32, 64], # the number of hyperplanes to used
+        'nbits' : [2, 6, 8, 16, 24, 32, 64, 128, 256, 512, 768, 1024], # the number of hyperplanes to used 2, 6, 8, 16, 24, 32, 64, 128, 256, 512, 1024
         'results' : []
     },
     'HNSWFlat' : {
         'Index' : 'HNSWFlat',
         'params' : ['M'],
-        'M' : [32, 64], # the number of nearest neighbor connections every vertex in the constructed graph has
+        'M' : [16, 32, 64, 96], # the number of nearest neighbor connections every vertex in the constructed graph has
         'results' : []
     }
 }
