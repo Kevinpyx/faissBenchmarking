@@ -28,7 +28,7 @@ INDPARAM = {
     'LSH' : {
         'Index' : 'LSH',
         'params' : ['nbits'],
-        'nbits' : [2, 6, 8, 16, 24, 32, 64, 128, 256, 512, 768, 1024], # the number of hyperplanes to used 2, 6, 8, 16, 24, 32, 64, 128, 256, 512, 1024
+        'nbits' : [2, 6, 8, 16, 24, 32, 64, 128, 256, 512, 1024], # the number of hyperplanes to used 2, 6, 8, 16, 24, 32, 64, 128, 256, 512, 1024
         'results' : []
     },
     'HNSWFlat' : {
