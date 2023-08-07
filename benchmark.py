@@ -21,14 +21,14 @@ INDPARAM = {
     'PQ' : { # product quantization
         'Index' : 'PQ',
         'params' : ['m', 'nbits'],
-        'm' : [1, 3, 8, 16, 32, 48], # number of subspaces
-        'nbits' : [6, 8, 10], # 2^n is number of centroid for every subspace
+        'm' : [8, 32], # number of subspaces
+        'nbits' : [8, 10], # 2^n is number of centroid for every subspace
         'results' : [] # the results will be stored in this list
     }, 
     'LSH' : {
         'Index' : 'LSH',
         'params' : ['nbits'],
-        'nbits' : [2, 6, 8, 16, 24, 32, 64, 128, 256, 512, 1024], # the number of hyperplanes to used 2, 6, 8, 16, 24, 32, 64, 128, 256, 512, 1024
+        'nbits' : [2, 6, 8, 16, 24, 32, 64, 128], # the number of hyperplanes to used 2, 6, 8, 16, 24, 32, 64, 128, 256, 512, 1024 || 256 runs out of memory with 50M
         'results' : []
     },
     'HNSWFlat' : {
