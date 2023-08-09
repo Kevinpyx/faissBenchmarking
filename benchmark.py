@@ -34,12 +34,19 @@ INDPARAM = {
     'HNSWFlat' : {
         'Index' : 'HNSWFlat',
         'params' : ['M'],
-        'M' : [16, 32, 64, 96], # the number of nearest neighbor connections every vertex in the constructed graph has
+        'M' : [4], # the number of nearest neighbor connections every vertex in the constructed graph has (16, 32, 64, 96) || 8 runs out of memory with 50M
         'results' : []
     }
 }
 
 INDLIST = list(INDPARAM.keys())
+
+# check if we are using faiss-gpu
+# return 0 if not using gpu
+# return the number of gpus if using gpu
+def check_gpu():
+    return faiss.get_num_gpus()
+
 
 # Train and add data to indexes
 #   precon: 

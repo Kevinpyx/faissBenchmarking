@@ -14,6 +14,15 @@ method = 'HNSWFlat'
 k = 100
 data_size = 5 * 10**7 # 50M
 
+# print whether we are using GPU or not and set file suffix
+gpu_core =  bm.check_gpu()
+if gpu_core:
+    print('Using ' + str(gpu_core) + ' GPU cores')
+    gpu = "_GPU"
+else:
+    print('Using CPU')
+    gpu = ""
+
 # Read data
 print('Fetching dataset')
 xb = io.read_fbin(dataset, chunk_size=data_size) # the whole dataset
@@ -32,6 +41,6 @@ result_dict = bm.runBenchmark(method, xb, xq, GT_id, k, run=1)
 
 # Save results
 print('Saving results')
-filename = '/home/ypx/faissTesting/benchmark/results/' + method + '_' + '50M' + '_' + str(dim) + '_' + '10k' + '_' + str(k) + '.h5'
+filename = '/home/ypx/faissTesting/benchmark/results/' + method + '_' + '50M' + '_' + str(dim) + '_' + '10k' + '_' + str(k) + gpu + '.h5'
 io.save_results(filename, result_dict['results'])
 print('Results saved')
