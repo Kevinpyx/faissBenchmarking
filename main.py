@@ -15,7 +15,7 @@ query_set = '/home/ypx/faissTesting/dataset/yandex_deep/query.public.10K.fbin'
 # Search specifications
 # method: currently only 'FlatL2', 'PQ', 'LSH', 'HNSWFlat' are defined
 # k: 1~100
-method = 'HNSWFlat'
+method = 'LSH'
 k = 100
 data_size = 1 * 10**7 # 10M
 size_file = '10M'
@@ -43,7 +43,7 @@ K = GT_id.shape[1] # the number of nearest neighbors
 print('Data loaded\n...........................')
 print('Database size: ' + str(num))
 
-result_dict = bm.runBenchmark(method, xb, xq, GT_id, k, run=2)
+result_dict = bm.runBenchmark(method, xb, xq, GT_id, k, run=1)
 
 # Save results
 print('Saving results')
