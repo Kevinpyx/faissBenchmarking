@@ -1,4 +1,5 @@
 # This file wraps 'main.py' into a function and runs it for different indexes and datasizes automatically.
+# Please use this file along with runAotoBenchmark.sh
 import dataI_O as io
 import benchmark as bm
 
@@ -51,6 +52,9 @@ k = 100
 data_size = 25 * 10**6
 size_file = '25M'
 
-# Run autoBenchmark
+# Run autoBenchmark for all methods with same size
+'''
 for method in method_lsit:
     autoBenchmark(method, k, data_size, size_file, dataset=deep1B, ground_truth=ground_truth_25M_1B, query_set=query_set)
+'''
+

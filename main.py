@@ -10,16 +10,16 @@ ground_truth_50M_1B = '/home/ypx/faissTesting/dataset/yandex_deep/my_ground_trut
 
 # Define dataset and ground truth to be used here
 dataset = deep1B
-ground_truth = ground_truth_25M_1B
+ground_truth = ground_truth_50M_1B
 query_set = '/home/ypx/faissTesting/dataset/yandex_deep/query.public.10K.fbin'
 
 # Search specifications
 # method: currently only 'FlatL2', 'PQ', 'LSH', 'HNSWFlat' are defined
 # k: 1~100
-method = 'PQ'
+method = 'HNSWFlat'
 k = 100
-data_size = 25 * 10**6
-size_file = '25M'
+data_size = 50 * 10**6
+size_file = '50M'
 
 # print whether we are using GPU or not and set file suffix
 gpu_core =  bm.check_gpu()
