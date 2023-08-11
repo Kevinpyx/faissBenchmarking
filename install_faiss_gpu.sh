@@ -1,3 +1,4 @@
+#!/bin/bash
 # first uninstall faiss-cpu
 echo 'Y' | pip uninstall faiss-cpu
 # install faiss-gpu
