@@ -5,20 +5,21 @@ import benchmark as bm
 deep10M = '/home/ypx/faissTesting/dataset/yandex_deep/base.10M.fbin'
 deep1B = '/home/ypx/faissTesting/dataset/yandex_deep/base.1B.fbin'
 ground_truth_10M_10M = '/home/ypx/faissTesting/dataset/yandex_deep/my_ground_truth_10M_10M' # I made the ground truth according to the dataset base.10M.fbin and query set query.public.10K.fbin
+ground_truth_25M_1B = '/home/ypx/faissTesting/dataset/yandex_deep/my_ground_truth_25M_1B'
 ground_truth_50M_1B = '/home/ypx/faissTesting/dataset/yandex_deep/my_ground_truth_50M_1B'
 
 # Define dataset and ground truth to be used here
-dataset = deep10M
-ground_truth = ground_truth_10M_10M
+dataset = deep1B
+ground_truth = ground_truth_25M_1B
 query_set = '/home/ypx/faissTesting/dataset/yandex_deep/query.public.10K.fbin'
 
 # Search specifications
 # method: currently only 'FlatL2', 'PQ', 'LSH', 'HNSWFlat' are defined
 # k: 1~100
-method = 'LSH'
+method = 'PQ'
 k = 100
-data_size = 1 * 10**7 # 10M
-size_file = '10M'
+data_size = 25 * 10**6
+size_file = '25M'
 
 # print whether we are using GPU or not and set file suffix
 gpu_core =  bm.check_gpu()

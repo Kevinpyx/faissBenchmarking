@@ -28,9 +28,10 @@ def write_ground_truth(xb, xq, k, filename):
         dists.tofile(f)
 
 ### Main
-data_size = 5 * 10**7 # 50M
+data_size = 25 * 10**6 # 25M
+size_in_filename = '25M'
 
-filename = '/home/ypx/faissTesting/dataset/yandex_deep/my_ground_truth_' + str(data_size) + '_1B'# meaning 100M vectors our of the 1B vector file
+filename = '/home/ypx/faissTesting/dataset/yandex_deep/my_ground_truth_' + str(size_in_filename) + '_1B'# meaning 100M vectors our of the 1B vector file
 dataset = '/home/ypx/faissTesting/dataset/yandex_deep/base.1B.fbin'
 query_set = '/home/ypx/faissTesting/dataset/yandex_deep/query.public.10K.fbin'
 print('reading data')
