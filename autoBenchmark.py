@@ -49,12 +49,12 @@ query_set = '/home/ypx/faissTesting/dataset/yandex_deep/query.public.10K.fbin'
 # k: 1~100
 method_lsit = ['FlatL2', 'PQ', 'LSH', 'HNSWFlat']
 k = 100
-data_size = 25 * 10**6
-size_file = '25M'
+data_size = 10 * 10**6
+size_file = '10M'
 
 # Run autoBenchmark for all methods with same size
 '''
 for method in method_lsit:
     autoBenchmark(method, k, data_size, size_file, dataset=deep1B, ground_truth=ground_truth_25M_1B, query_set=query_set)
 '''
-
+autoBenchmark('HNSWFlat', k, data_size, size_file, dataset=deep10M, ground_truth=ground_truth_10M_10M, query_set=query_set)
