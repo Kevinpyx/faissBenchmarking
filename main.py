@@ -16,7 +16,7 @@ query_set = '/home/ypx/faissTesting/dataset/yandex_deep/query.public.10K.fbin'
 # Search specifications
 # method: currently only 'FlatL2', 'PQ', 'LSH', 'HNSWFlat' are defined
 # k: 1~100
-method = 'HNSWFlat'
+method = 'PQ'
 k = 100
 data_size = 10 * 10**6
 size_file = '10M'

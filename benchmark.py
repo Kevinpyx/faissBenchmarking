@@ -34,7 +34,7 @@ INDPARAM = {
     'HNSWFlat' : {
         'Index' : 'HNSWFlat',
         'params' : ['M'],
-        'M' : [4, 8, 16, 32, 64, 96], # the number of nearest neighbor connections every vertex in the constructed graph has (16, 32, 64, 96) || 8 runs out of memory with 50M || 16 runs out of memory with 25M
+        'M' : [4], # the number of nearest neighbor connections every vertex in the constructed graph has (16, 32, 64, 96) || 8 runs out of memory with 50M || 16 runs out of memory with 25M
         'results' : []
     }
 }
