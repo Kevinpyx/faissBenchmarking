@@ -16,7 +16,7 @@ query_set = '/home/ypx/faissTesting/dataset/yandex_deep/query.public.10K.fbin'
 # Search specifications
 # method: currently only 'FlatL2', 'PQ', 'LSH', 'HNSWFlat' are defined
 # k: 1~100
-method = 'PQ'
+method = 'HNSWFlat'
 k = 100
 data_size = 10 * 10**6
 size_file = '10M'
@@ -50,4 +50,4 @@ result_dict = bm.runBenchmark(method, xb, xq, GT_id, k, run=1)
 print('Saving results')
 filename = '/home/ypx/faissTesting/benchmark/results/' + method + '_' + size_file + '_' + str(dim) + '_' + '10k' + '_' + str(k) + gpu + '.h5'
 io.save_results(filename, result_dict['results'])
-print('Results saved')
+print('Results saved as ' + filename + '\n...........................') 

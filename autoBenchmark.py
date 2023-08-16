@@ -32,7 +32,7 @@ def autoBenchmark(method, k, data_size, size_file, dataset, ground_truth, query_
     print('Saving results')
     filename = '/home/ypx/faissTesting/benchmark/results/' + method + '_' + size_file + '_' + str(dim) + '_' + '10k' + '_' + str(k) + gpu + '.h5'
     io.save_results(filename, result_dict['results'])
-    print('Results saved')
+    print('Results saved as ' + filename + '\n...........................')
 
 ################# Main #################
 
