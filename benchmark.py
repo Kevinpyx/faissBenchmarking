@@ -2,7 +2,8 @@ import time
 import faiss
 import numpy as np
 import itertools # for cartesian product
-import psutil # for memory usage
+import psutil # for RAM memory usage
+import nvidia_smi # for GPU memory usage
 
 # macro to indicate the number of indexing methods tested
 INDNUM = 4
@@ -28,13 +29,26 @@ INDPARAM = {
     'LSH' : {
         'Index' : 'LSH',
         'params' : ['nbits'],
-        'nbits' : [2, 6, 8, 16, 24, 32, 64, 128, 256], # the number of hyperplanes to used 2, 6, 8, 16, 24, 32, 64, 128, 256, 512, 768, 1024 || 256 runs out of memory with 50M || 512 runs out of memory with 25M
+        'nbits' : [2, 6, 8, 16, 24, 32, 64, 128, 256, 512, 768, 1024], # the number of hyperplanes to used 2, 6, 8, 16, 24, 32, 64, 128, 256, 512, 768, 1024 || 256 runs out of memory with 50M || 512 runs out of memory with 25M
         'results' : []
     },
     'HNSWFlat' : {
         'Index' : 'HNSWFlat',
         'params' : ['M'],
         'M' : [4, 8, 16, 32, 64, 96], # the number of nearest neighbor connections every vertex in the constructed graph has (16, 32, 64, 96) || 8 runs out of memory with 50M || 16 runs out of memory with 25M
+        'results' : []
+    },
+    'IVFFlat' : {
+        'Index' : 'IVFFlat',
+        'params' : ['nlist'],
+        'nlist' : [100, 1000, 10000], # the number of cells in the inverted file
+        'results' : []
+    },
+    'IVFPQ' : {
+        'Index' : 'IVFPQ',
+        'params' : ['nlist', 'm'], # add nbits when your program supports 3 parameters (currently the program only assumes max 2 parameters. The code that reshapes the results will need to be modified if you add more parameters)
+        'nlist' : [100, 1000, 10000], # the number of cells in the inverted file
+        'm' : [8, 16, 32], # number of subspaces
         'results' : []
     }
 }
@@ -106,6 +120,7 @@ def get_parameters(method):
     return param_combinations
 
 # a helper function for get_indeces to determine which index to use according to method
+# and return the corresponding index constructor
 def create_index(method):
     if method == 'FlatL2':
         def IndexFlatL2(d):
@@ -123,6 +138,14 @@ def create_index(method):
         def IndexHNSWFlat(d, M):
             return faiss.IndexHNSWFlat(d, M)
         return IndexHNSWFlat
+    elif method == 'IVFFlat': 
+        def IndexIVFFlat(d, nlist):
+            return faiss.IndexIVFFlat(faiss.IndexFlatL2(d), d, nlist)
+        return IndexIVFFlat
+    elif method == 'IVFPQ':
+        def IndexIVFPQ(d, nlist, m):
+            return faiss.IndexIVFPQ(faiss.IndexFlatL2(d), d, nlist, m, 8) # use 2**8 centroids for PQ (change here for different number of centroids or add nbits as a parameter when your program supports 3 parameters)
+        return IndexIVFPQ
     
 # return the algorithms to benchmark with different values received
 #   precon: 
@@ -175,8 +198,14 @@ def get_accuracy(GT_id, pred_id): #calculate the hit rate
 
     return hit_count/np.prod(GT_id.shape) # the hit rate = hit count/number of elements in GT
 
-def measure_memory_usage():
-    return psutil.Process().memory_info().rss / (1024 * 1024)
+def get_ram_memory_usage():
+    return psutil.Process().memory_info().rss # memory usage in bytes
+
+def get_gpu_memory_usage():
+    nvidia_smi.nvmlInit()
+    handle = nvidia_smi.nvmlDeviceGetHandleByIndex(0) # gpu id 0 (assuming only one gpu)
+    info = nvidia_smi.nvmlDeviceGetMemoryInfo(handle)
+    return info.used # memory usage in bytes
 
 # runBenchmark: 
 #   precon: 
@@ -184,7 +213,7 @@ def measure_memory_usage():
 #       - k must be an integer between 1 and k_max in the ground truth
 #       - GT.shape = query_size * k_max * 2 (first layer: ids, second layer: distances)
 
-def runBenchmark(method, xb, xq, GT_id, k=None, run=1): 
+def runBenchmark(method, xb, xq, GT_id, k=None,use_gpu=True, run=1): 
     # check whether method is valid
     if method in INDLIST:
         pass
@@ -239,23 +268,37 @@ def runBenchmark(method, xb, xq, GT_id, k=None, run=1):
         hit_rates = []
     
         # for every index, we train and perform timed search
-        for ind in indList:
+        for ind_cpu in indList:
             if param_combinations is None:
                 print('Round 1 / 1: Index', method, 'with parameter', dim) 
             else:
                 print('Round', round_number, '/', total_rounds, ': Index', method, 'with parameters', dim, *param_combinations[round_number-1])
 
-            # train the index and get time spent
-            t_t, t_a = train_index(ind, xb)
+            # train and add the index and get time spent
+            t_t, t_a = train_index(ind_cpu, xb)
             training_time.append(t_t)
             adding_time.append(t_a)
+
+            # Move the index to the GPU
+            if use_gpu:
+                res = faiss.StandardGpuResources() # GPU resource object
+                gpu_memory_before = get_gpu_memory_usage() # get GPU memory usage before moving the index so that later we can subtract it from the current usage to get the memory usage of the index
+                gpu_id = 0 # the GPU core to use (only one on this machine)
+                ind = faiss.index_cpu_to_gpu(res, gpu_id, ind_cpu) # move the index to GPU
+                ind_cpu.reset() # reset the index on CPU
+                print('Index moved to GPU')
+            else:
+                ind = ind_cpu # use the index on CPU
+                ind_cpu.reset() # reset the index on CPU
 
             # start the timer
             start_time = time.time()
 
+            # measure memory usage (automatically save GPU memory if use_gpu is True)
+            memory.append(((get_gpu_memory_usage() - gpu_memory_before) if use_gpu else get_ram_memory_usage())/(1024 * 1024)) # memory usage in MB
+
             # perform search
             print('Searching for', k, 'nearest neighbors...')
-            memory.append(measure_memory_usage())
             pred_dist, pred_id = search_index(ind, xq, k)
 
             # end the timer

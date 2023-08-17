@@ -14,16 +14,18 @@ ground_truth = ground_truth_10M_10M
 query_set = '/home/ypx/faissTesting/dataset/yandex_deep/query.public.10K.fbin'
 
 # Search specifications
-# method: currently only 'FlatL2', 'PQ', 'LSH', 'HNSWFlat' are defined
+# method: currently only 'FlatL2', 'PQ', 'LSH', 'HNSWFlat', 'IVFFlat', 'IVFPQ' are defined
 # k: 1~100
-method = 'HNSWFlat'
+method = 'IVFPQ'
 k = 100
 data_size = 10 * 10**6
 size_file = '10M'
+use_gpu = True
+run = 1
 
 # print whether we are using GPU or not and set file suffix
 gpu_core =  bm.check_gpu()
-if gpu_core:
+if use_gpu and gpu_core > 0:
     print('Using ' + str(gpu_core) + ' GPU cores')
     gpu = "_GPU"
 else:
@@ -42,9 +44,9 @@ GT_id, GT_dist = io.read_ground_truth(ground_truth) # GT means ground truth
 # GT = np.dstack((GT_id, GT_dist)) # GT.shape = query_size * k * 2
 K = GT_id.shape[1] # the number of nearest neighbors
 print('Data loaded\n...........................')
-print('Database size: ' + str(num))
+print('Dataset size: ' + size_file)
 
-result_dict = bm.runBenchmark(method, xb, xq, GT_id, k, run=1)
+result_dict = bm.runBenchmark(method, xb, xq, GT_id, k, run=run, use_gpu=True)
 
 # Save results
 print('Saving results')

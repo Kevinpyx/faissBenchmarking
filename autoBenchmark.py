@@ -4,10 +4,10 @@ import dataI_O as io
 import benchmark as bm
 
 # the function that wraps 'main.py'
-def autoBenchmark(method, k, data_size, size_file, dataset, ground_truth, query_set, run=1):
+def autoBenchmark(method, k, data_size, size_file, dataset, ground_truth, query_set, use_gpu=True, run=1):
     # print whether we are using GPU or not and set file suffix
     gpu_core =  bm.check_gpu()
-    if gpu_core:
+    if use_gpu and gpu_core > 0:
         print('Using ' + str(gpu_core) + ' GPU cores')
         gpu = "_GPU"
     else:
@@ -24,9 +24,9 @@ def autoBenchmark(method, k, data_size, size_file, dataset, ground_truth, query_
     GT_id, _ = io.read_ground_truth(ground_truth) # GT means ground truth
     # GT = np.dstack((GT_id, GT_dist)) # GT.shape = query_size * k * 2
     print('Data loaded\n...........................')
-    print('Database size: ' + str(num))
+    print('Dataset size: ' + size_file)
 
-    result_dict = bm.runBenchmark(method, xb, xq, GT_id, k, run=run)
+    result_dict = bm.runBenchmark(method, xb, xq, GT_id, k, use_gpu=use_gpu, run=run)
 
     # Save results
     print('Saving results')
@@ -45,16 +45,29 @@ ground_truth_50M_1B = '/home/ypx/faissTesting/dataset/yandex_deep/my_ground_trut
 query_set = '/home/ypx/faissTesting/dataset/yandex_deep/query.public.10K.fbin'
 
 # Search specifications
-# method: currently only 'FlatL2', 'PQ', 'LSH', 'HNSWFlat' are defined  
+# method: currently only 'FlatL2', 'PQ', 'LSH', 'HNSWFlat', 'IVFFlat', 'IVFPQ' are defined  
 # k: 1~100
-method_lsit = ['FlatL2', 'PQ', 'LSH', 'HNSWFlat']
+method_lsit = ['FlatL2', 'PQ', 'LSH', 'HNSWFlat', 'IVFFlat', 'IVFPQ']
 k = 100
 data_size = 10 * 10**6
 size_file = '10M'
+use_gpu = True
+run = 3
 
 # Run autoBenchmark for all methods with same size
 '''
 for method in method_lsit:
     autoBenchmark(method, k, data_size, size_file, dataset=deep1B, ground_truth=ground_truth_25M_1B, query_set=query_set)
 '''
-autoBenchmark('HNSWFlat', k, data_size, size_file, dataset=deep10M, ground_truth=ground_truth_10M_10M, query_set=query_set)
+
+'''
+# FlatL2 at different sizes 
+autoBenchmark('FlatL2', k, data_size=10*10**6, size_file='10M', dataset=deep10M, ground_truth=ground_truth_10M_10M, query_set=query_set, use_gpu=use_gpu, run=run)
+
+autoBenchmark('FlatL2', k, data_size=25*10**6, size_file='25M', dataset=deep1B, ground_truth=ground_truth_25M_1B, query_set=query_set, use_gpu=use_gpu, run=run)
+
+autoBenchmark('FlatL2', k, data_size=50*10**6, size_file='50M', dataset=deep1B, ground_truth=ground_truth_50M_1B, query_set=query_set, use_gpu=use_gpu, run=run)
+'''
+
+# LSH at 10M using gpu
+autoBenchmark('LSH', k, data_size=10*10**6, size_file='10M', dataset=deep10M, ground_truth=ground_truth_10M_10M, query_set=query_set, use_gpu=use_gpu, run=run)
