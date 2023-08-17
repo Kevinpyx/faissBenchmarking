@@ -8,7 +8,7 @@ def write_ground_truth(xb, xq, k, filename):
     # k: the number of nearest neighbors to be searched
     # the function writes the ground truth to a binary file in the format specified in the benchmark
 
-    index = faiss.IndexFlatL2(xb.shape[1])
+    index = faiss.GpuIndexFlatL2(xb.shape[1])
     print('building index')
     index.add(xb)
     print('searching...')
