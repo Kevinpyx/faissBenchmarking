@@ -5,5 +5,6 @@ The *_GPU.h5 files in results did not actually use gpu except for FlatL2 due to 
 ### Next steps
 Change the ipynb file so that they just compare the results with CPU for 10M, 25M, 50M
 Add support to indexes with 3 parameters (e.g. `IVFPQ`)
+Add parameters to the file saved or the file name to indicate the parameters used (important!!)
 Automatically measure GPU memory usage when use_gpu = True (done)
 
