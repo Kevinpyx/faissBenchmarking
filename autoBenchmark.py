@@ -77,16 +77,9 @@ autoBenchmark('LSH', k, data_size=10*10**6, size_file='10M', dataset=deep10M, gr
 '''
 
 run = 1
-# IVFFlat and IVGPW at 10M with and without gpu
-method = 'IVFFlat'
-autoBenchmark(method, k, data_size=10*10**6, size_file='10M', dataset=deep10M, ground_truth=ground_truth_10M_10M, query_set=query_set, use_gpu=True, run=run)
-autoBenchmark(method, k, data_size=10*10**6, size_file='10M', dataset=deep10M, ground_truth=ground_truth_10M_10M, query_set=query_set, use_gpu=False, run=run)
-method = 'IVFPQ'
-# autoBenchmark(method, k, data_size=10*10**6, size_file='10M', dataset=deep10M, ground_truth=ground_truth_10M_10M, query_set=query_set, use_gpu=True, run=run) # this is done
-autoBenchmark(method, k, data_size=10*10**6, size_file='10M', dataset=deep10M, ground_truth=ground_truth_10M_10M, query_set=query_set, use_gpu=False, run=run)
 # IVFFlat and IVGPW at 25M with and without gpu
 method = 'IVFFlat'
-autoBenchmark(method, k, data_size=25*10**6, size_file='25M', dataset=deep1B, ground_truth=ground_truth_25M_1B, query_set=query_set, use_gpu=True, run=run)
+# autoBenchmark(method, k, data_size=25*10**6, size_file='25M', dataset=deep1B, ground_truth=ground_truth_25M_1B, query_set=query_set, use_gpu=True, run=run)
 autoBenchmark(method, k, data_size=25*10**6, size_file='25M', dataset=deep1B, ground_truth=ground_truth_25M_1B, query_set=query_set, use_gpu=False, run=run)
 method = 'IVFPQ'
 autoBenchmark(method, k, data_size=25*10**6, size_file='25M', dataset=deep1B, ground_truth=ground_truth_25M_1B, query_set=query_set, use_gpu=True, run=run)
